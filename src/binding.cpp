@@ -144,17 +144,16 @@ public:
       Set(obj, scoreKey, New(match.score));
       Set(obj, valueKey, New(*match.value).ToLocalChecked());
 
-      v8::Local<v8::Context> context = Nan::GetCurrentContext();
       if (match.matchIndexes != nullptr)
       {
         auto array = New<v8::Array>(match.matchIndexes->size());
         for (size_t i = 0; i < array->Length(); i++)
         {
-          array->Set(context, i, New(match.matchIndexes->at(i)));
+          Nan::Set(array, 1, New(match.matchIndexes->at(i)));
         }
         Set(obj, matchIndexesKey, array);
       }
-      result->Set(context, result_count++, obj);
+      Nan::Set(result, result_count++, obj);
     }
     info.GetReturnValue().Set(result);
   }
