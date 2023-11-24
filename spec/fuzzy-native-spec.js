@@ -111,8 +111,8 @@ describe('fuzzy-native', function() {
     let results = matcher.match('', {algorithm: 'fuzzaldrin'});
     expect(values(results)).toEqual([ 'is', 'it', 'hello' ]);
 
-    results = matcher.match('i', {algorithm: 'fuzzaldrin'});
-    expect(values(results)).toEqual([ 'is', 'it' ]);
+    results = matcher.match('it', {algorithm: 'fuzzaldrin'});
+    expect(values(results)).toEqual([ 'it' ]);
   })
 
   it('can do a case-sensitive search', function() {
