@@ -2,3 +2,7 @@
 # See the root package.json's "files" for what is included.
 # npm5 ignores empty .npmignore files so add something trivial.
 /node_modules
+.travis.yml
+.last-synced-commit
+.github
+npm-debug.log
