@@ -35,3 +35,6 @@ node_modules
 
 # Local-only
 local
+
+# `clangd` cache files
+.cache
