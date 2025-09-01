@@ -21,10 +21,10 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v4
       with:
-        node-version: 16
+        node-version: ${{ env.NODE_VERSION }}
 
-    - name: Install Python setuptools
-      run: python3 -m pip install setuptools
+    # - name: Install Python setuptools
+    #   run: python3 -m pip install setuptools
 
     - name: Install Dependencies
       run: npm ci
