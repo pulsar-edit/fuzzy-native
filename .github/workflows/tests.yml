@@ -4,19 +4,22 @@ on:
   push:
     branches: ['master']
 
+env:
+  NODE_VERSION: 16
+
 jobs:
   test:
     name: Run tests
+    runs-on: ubuntu-latest
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
-    runs-on: ubuntu-22.04
     steps:
     - name: Checkout the latest code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup node
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 16
 
@@ -24,7 +27,7 @@ jobs:
       run: python3 -m pip install setuptools
 
     - name: Install Dependencies
-      run: npm install
+      run: npm ci
 
     - name: Run tests
-      run: npm run test
+      run: npm test
