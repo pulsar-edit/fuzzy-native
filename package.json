@@ -1,6 +1,6 @@
 {
   "name": "@pulsar-edit/fuzzy-native",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Native C++ implementation of a fuzzy string matcher.",
   "main": "lib/main.js",
   "scripts": {
