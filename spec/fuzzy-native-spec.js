@@ -109,7 +109,7 @@ describe('fuzzy-native', function() {
   it('can match empty strings for alternate scoring', function() {
     matcher.setCandidates([1, 2, 3], ["hello", "is", "it"]);
     let results = matcher.match('', {algorithm: 'fuzzaldrin'});
-    expect(values(results)).toEqual([ 'is' 'it' 'hello' ]);
+    expect(values(results)).toEqual([ 'is', 'it', 'hello' ]);
 
     results = matcher.match('i', {algorithm: 'fuzzaldrin'});
     expect(values(results)).toEqual([ 'is', 'it' ]);
