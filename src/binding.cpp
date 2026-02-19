@@ -36,8 +36,14 @@ T get_property(const v8::Local<v8::Object> &object, const char *name)
 std::string to_std_string(const v8::Local<v8::String> &v8str)
 {
   v8::Isolate *isolate = v8::Isolate::GetCurrent();
+#if V8_MAJOR_VERSION > 13 || (V8_MAJOR_VERSION == 13 && V8_MINOR_VERSION >= 2)
+  size_t len = v8str->Utf8LengthV2(isolate);
+  std::string str(len, ' ');
+  v8str->WriteUtf8V2(isolate, &str[0], len);
+#else
   std::string str(v8str->Utf8Length(isolate), ' ');
   v8str->WriteUtf8(isolate, &str[0]);
+#endif
   return str;
 }
 
