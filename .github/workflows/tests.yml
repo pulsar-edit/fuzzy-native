@@ -11,6 +11,9 @@ jobs:
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node_version: [16, '${{ vars.NODE_VERSION }}' ]
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v3
@@ -18,7 +21,7 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: 16
+        node-version: '${{ matrix.node_version }}'
 
     - name: Install Python setuptools
       run: python3 -m pip install setuptools
