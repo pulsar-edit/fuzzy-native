@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    name: Run tests
+    name: Run tests ('${{ matrix.node_version }}')
     if: |
       !startsWith(github.event.pull_request.title, '[skip-ci]') &&
       !startsWith(github.event.pull_request.title, '[skip-package-ci]')
