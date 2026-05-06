@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node_version: [16, '${{ vars.NODE_VERSION }}' ]
+        node_version: [20, '${{ vars.NODE_VERSION }}' ]
     steps:
     - name: Checkout the latest code
       uses: actions/checkout@v3
