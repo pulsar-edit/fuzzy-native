@@ -4,12 +4,12 @@
       'target_name': 'fuzzy-native',
       'include_dirs': [ '<!(node -e "require(\'nan\')")' ],
       'cflags': [
-        '-std=c++17',
+        '-std=c++20',
         '-O3',
       ],
       'xcode_settings': {
         'OTHER_CPLUSPLUSFLAGS': [
-          '-std=c++17',
+          '-std=c++20',
           '-O3',
           '-stdlib=libc++',
         ],
