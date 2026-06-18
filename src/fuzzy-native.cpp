@@ -1,5 +1,7 @@
 #include "fuzzy-native.h"
 
+#include <cmath>
+
 using namespace Napi;
 
 #define CHECK(env, cond, msg)                                    \
