@@ -8,12 +8,14 @@ function values(results) {
   });
 }
 
+/** @returns {[number[], string[]]} */
 function genIds(values) {
   return [Array.from({length: values.length}, (_, i) => i), values];
 }
 
 describe('fuzzy-native', function() {
-  var matcher;
+  /** @type {import('../lib/main').Matcher} */
+  let matcher;
   beforeEach(function() {
     const paths = [
       '',
