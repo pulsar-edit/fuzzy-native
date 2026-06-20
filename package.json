@@ -3,6 +3,7 @@
   "version": "1.3.2",
   "description": "Native C++ implementation of a fuzzy string matcher.",
   "main": "lib/main.js",
+  "types": "lib/main.d.ts",
   "scripts": {
     "test": "jasmine-node --captureExceptions spec"
   },
@@ -21,10 +22,10 @@
   "repository": "https://github.com/pulsar-edit/fuzzy-native",
   "license": "MIT",
   "dependencies": {
-    "nan": "^2.18.0"
   },
   "devDependencies": {
     "jasmine-node": "^1.14.5",
+    "node-addon-api": "^8.8.0",
     "rimraf": "^2.5.2"
   }
 }

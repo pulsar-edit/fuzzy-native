@@ -2,7 +2,10 @@
   'targets': [
     {
       'target_name': 'fuzzy-native',
-      'include_dirs': [ '<!(node -e "require(\'nan\')")' ],
+      'include_dirs': [
+        '<!@(node -p "require(\'node-addon-api\').include")'
+      ],
+      'defines': ['NAPI_DISABLE_CPP_EXCEPTIONS'],
       'cflags': [
         '-std=c++20',
         '-O3',
@@ -16,7 +19,7 @@
         'MACOSX_DEPLOYMENT_TARGET': '10.7',
       },
       'sources': [
-        'src/binding.cpp',
+        'src/fuzzy-native.cpp',
         'src/fuzzaldrin_score.cpp',
         'src/score_match.cpp',
         'src/MatcherBase.cpp',
