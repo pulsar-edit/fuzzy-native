@@ -1,6 +1,6 @@
 #include "MatcherBase.h"
-#include "score_match.h"
 #include "fuzzaldrin_score.h"
+#include "score_match.h"
 
 #include <algorithm>
 #include <atomic>
@@ -34,7 +34,7 @@ inline uint64_t letter_bitmask(const std::string &str) {
 
 inline string str_to_lower(const std::string &s) {
   string lower(s);
-  for (auto& c : lower) {
+  for (auto &c : lower) {
     if (c >= 'A' && c <= 'Z') {
       c += 'a' - 'A';
     }
@@ -42,9 +42,7 @@ inline string str_to_lower(const std::string &s) {
   return lower;
 }
 
-bool is_slash(char c) {
-  return c == '/' || c == '\\';
-}
+bool is_slash(char c) { return c == '/' || c == '\\'; }
 
 int num_dirs(const std::string &path) {
   int num = 0;
@@ -86,12 +84,8 @@ int score_based_root_path(const MatchOptions &options,
 }
 
 // Push a new entry on the heap while ensuring size <= max_results.
-void push_heap(ResultHeap &heap,
-               float score,
-               int score_based_root_path,
-               uint32_t id,
-               const std::string *value,
-               size_t max_results) {
+void push_heap(ResultHeap &heap, float score, int score_based_root_path,
+               uint32_t id, const std::string *value, size_t max_results) {
   MatchResult result(score, score_based_root_path, id, value);
   if (heap.size() < max_results || result < heap.top()) {
     heap.push(std::move(result));
@@ -101,26 +95,17 @@ void push_heap(ResultHeap &heap,
   }
 }
 
-vector<MatchResult> finalize(const string &query,
-                             const string &query_case,
+vector<MatchResult> finalize(const string &query, const string &query_case,
                              const MatchOptions &options,
-                             bool record_match_indexes,
-                             ResultHeap &&heap) {
+                             bool record_match_indexes, ResultHeap &&heap) {
   vector<MatchResult> vec;
   while (heap.size()) {
     const MatchResult &result = heap.top();
     if (record_match_indexes) {
       result.matchIndexes.reset(new vector<int>(query.size()));
       string lower = str_to_lower(*result.value);
-      score_match(
-        result.value->c_str(),
-        lower.c_str(),
-        query.c_str(),
-        query_case.c_str(),
-        options,
-        0.0,
-        result.matchIndexes.get()
-      );
+      score_match(result.value->c_str(), lower.c_str(), query.c_str(),
+                  query_case.c_str(), options, 0.0, result.matchIndexes.get());
     }
     vec.push_back(result);
     heap.pop();
@@ -129,18 +114,11 @@ vector<MatchResult> finalize(const string &query,
   return vec;
 }
 
-void thread_worker(
-  const string &query,
-  const string &query_case,
-  const MatchOptions &options,
-  bool use_last_match,
-  std::atomic<float>* min_score,
-  size_t max_results,
-  vector<MatcherBase::CandidateData> &candidates,
-  size_t start,
-  size_t end,
-  ResultHeap &result
-) {
+void thread_worker(const string &query, const string &query_case,
+                   const MatchOptions &options, bool use_last_match,
+                   std::atomic<float> *min_score, size_t max_results,
+                   vector<MatcherBase::CandidateData> &candidates, size_t start,
+                   size_t end, ResultHeap &result) {
   uint64_t bitmask = letter_bitmask(query_case.c_str());
   for (size_t i = start; i < end; i++) {
     auto &candidate = candidates[i];
@@ -149,30 +127,19 @@ void thread_worker(
     }
     if ((bitmask & candidate.bitmask) == bitmask) {
       float score;
-      if(query == "") {
+      if (query == "") {
         score = 1;
-      } else if(options.fuzzaldrin) {
+      } else if (options.fuzzaldrin) {
         score = fuzzaldrin_score(candidate.value, query);
         score = fuzzaldrin_basename_score(candidate.value, query, score);
       } else {
-        score = score_match(
-          candidate.value.c_str(),
-          candidate.lowercase.c_str(),
-          query.c_str(),
-          query_case.c_str(),
-          options,
-          min_score->load()
-        );
+        score = score_match(candidate.value.c_str(),
+                            candidate.lowercase.c_str(), query.c_str(),
+                            query_case.c_str(), options, min_score->load());
       }
       if (score > 0) {
-        push_heap(
-          result,
-          score,
-          score_based_root_path(options, candidate),
-          candidate.id,
-          &candidate.value,
-          max_results
-        );
+        push_heap(result, score, score_based_root_path(options, candidate),
+                  candidate.id, &candidate.value, max_results);
         if (result.size() == max_results) {
           float current_max = result.top().score;
           float min_score_value = min_score->load();
@@ -232,8 +199,9 @@ vector<MatchResult> MatcherBase::findMatches(const std::string &query,
   ResultHeap combined;
   std::atomic<float> min_score(0);
   if (num_threads == 0 || candidates_.size() < 10000) {
-    thread_worker(new_query, query_case, matchOptions, use_last_match, &min_score,
-                  max_results, candidates_, 0, candidates_.size(), combined);
+    thread_worker(new_query, query_case, matchOptions, use_last_match,
+                  &min_score, max_results, candidates_, 0, candidates_.size(),
+                  combined);
   } else {
     vector<ResultHeap> thread_results(num_threads);
     vector<thread> threads;
@@ -244,19 +212,10 @@ vector<MatchResult> MatcherBase::findMatches(const std::string &query,
       if (i < candidates_.size() % num_threads) {
         chunk_size++;
       }
-      threads.emplace_back(
-        thread_worker,
-        ref(new_query),
-        ref(query_case),
-        ref(matchOptions),
-        use_last_match,
-        &min_score,
-        max_results,
-        ref(candidates_),
-        cur_start,
-        cur_start + chunk_size,
-        ref(thread_results[i])
-      );
+      threads.emplace_back(thread_worker, ref(new_query), ref(query_case),
+                           ref(matchOptions), use_last_match, &min_score,
+                           max_results, ref(candidates_), cur_start,
+                           cur_start + chunk_size, ref(thread_results[i]));
       cur_start += chunk_size;
     }
 
@@ -264,26 +223,15 @@ vector<MatchResult> MatcherBase::findMatches(const std::string &query,
       threads[i].join();
       while (thread_results[i].size()) {
         auto &top = thread_results[i].top();
-        push_heap(
-          combined,
-          top.score,
-          top.score_based_root_path,
-          top.id,
-          top.value,
-          max_results
-        );
+        push_heap(combined, top.score, top.score_based_root_path, top.id,
+                  top.value, max_results);
         thread_results[i].pop();
       }
     }
   }
 
-  return finalize(
-    new_query,
-    query_case,
-    matchOptions,
-    options.record_match_indexes,
-    move(combined)
-  );
+  return finalize(new_query, query_case, matchOptions,
+                  options.record_match_indexes, std::move(combined));
 }
 
 void MatcherBase::addCandidate(uint32_t id, const string &candidate) {
@@ -295,10 +243,10 @@ void MatcherBase::addCandidate(uint32_t id, const string &candidate) {
     data.id = id;
     data.value = candidate;
     data.bitmask = letter_bitmask(lowercase.c_str());
-    data.lowercase = move(lowercase);
+    data.lowercase = std::move(lowercase);
     data.last_match = true;
     data.num_dirs = num_dirs(candidate);
-    candidates_.emplace_back(move(data));
+    candidates_.emplace_back(std::move(data));
   }
 }
 
@@ -324,6 +272,4 @@ void MatcherBase::reserve(size_t n) {
   lookup_.reserve(n);
 }
 
-size_t MatcherBase::size() const {
-  return candidates_.size();
-}
+size_t MatcherBase::size() const { return candidates_.size(); }

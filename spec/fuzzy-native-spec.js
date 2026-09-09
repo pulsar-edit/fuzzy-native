@@ -8,12 +8,14 @@ function values(results) {
   });
 }
 
+/** @returns {[number[], string[]]} */
 function genIds(values) {
   return [Array.from({length: values.length}, (_, i) => i), values];
 }
 
 describe('fuzzy-native', function() {
-  var matcher;
+  /** @type {import('../lib/main').Matcher} */
+  let matcher;
   beforeEach(function() {
     const paths = [
       '',
@@ -108,8 +110,12 @@ describe('fuzzy-native', function() {
 
   it('can match empty strings for alternate scoring', function() {
     matcher.setCandidates([1, 2, 3], ["hello", "is", "it"]);
+    // An empty query scores every candidate as 1, and 'is'/'it' are also
+    // tied on length, so only 'hello' is guaranteed to sort last.
     let results = matcher.match('', {algorithm: 'fuzzaldrin'});
-    expect(values(results)).toEqual([ 'is', 'it', 'hello' ]);
+    const emptyQueryResults = values(results);
+    expect(emptyQueryResults.slice(0, 2).sort()).toEqual(['is', 'it']);
+    expect(emptyQueryResults[2]).toEqual('hello');
 
     results = matcher.match('it', {algorithm: 'fuzzaldrin'});
     expect(values(results)).toEqual([ 'it' ]);
@@ -332,13 +338,15 @@ describe('fuzzy-native', function() {
       ['/path1/path2/path3/zzz', '/path1/path2/path3/zzz_ooo', '/path1/path2/path3/zzz/ooo']
     );
 
-    expect(
-      values(matcher.match('path1/path2/path3/zzz', {caseSensitive: true}))
-    ).toEqual([
-      '/path1/path2/path3/zzz',
+    // The exact match should rank first; the other two candidates are an
+    // exact score tie for this query (same matched prefix, same length),
+    // so their relative order isn't guaranteed.
+    const exactMatches = values(matcher.match('path1/path2/path3/zzz', {caseSensitive: true}));
+    expect(exactMatches[0]).toEqual('/path1/path2/path3/zzz');
+    expect(exactMatches.slice(1).sort()).toEqual([
       '/path1/path2/path3/zzz/ooo',
       '/path1/path2/path3/zzz_ooo'
-    ]);
+    ].sort());
     expect(
       values(matcher.match('zzz_ooo', {caseSensitive: true}))
     ).toEqual([

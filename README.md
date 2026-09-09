@@ -8,54 +8,7 @@ The scoring algorithm is heavily tuned for file paths, but should work for gener
 
 ## API
 
-```ts
-export type MatcherOptions = {
-  // Default: false
-  caseSensitive?: boolean,
-
-  // Default: infinite
-  maxResults?: number,
-
-  // Maximum gap to allow between consecutive letters in a match.
-  // Provide a smaller maxGap to speed up query results.
-  // Default: unlimited
-  maxGap?: number;
-
-  // Default: 1
-  numThreads?: number,
-
-  // Default: false
-  recordMatchIndexes?: boolean,
-
-  // can be either "fuzzaldrin" or anything else to use the file-based option
-  algorithm?: string
-}
-
-export type MatchResult = {
-  id: number,
-  value: string,
-
-  // A number in the range (0-1]. Higher scores are more relevant.
-  // 0 denotes "no match" and will never be returned.
-  score: number,
-
-  // Matching character index in `value` for each character in `query`.
-  // This can be costly, so this is only returned if `recordMatchIndexes` was set in `options`.
-  matchIndexes?: Array<number>,
-}
-
-export class Matcher {
-  constructor(candidates: Array<string>) {}
-
-  // Returns all matching candidates (subject to `options`).
-  // Will be ordered by score, descending.
-  match: (query: string, options?: MatcherOptions) => Array<MatchResult>;
-
-  addCandidates: (ids: Array<number>, candidates: Array<string>) => void;
-  removeCandidates: (ids: Array<number>) => void;
-  setCandidates: (ids: Array<number>, candidates: Array<string>) => void;
-}
-```
+Read `lib/main.d.ts` for the API of the `Matcher` class.
 
 See also the [spec](spec/fuzzy-native-spec.js) for basic usage.
 
